@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: pg-server
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["host.docker.internal:8080"]
+
+  - job_name: card-server
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["host.docker.internal:8081"]
+
+  - job_name: mysql
+    static_configs:
+      - targets: ["mysqld-exporter-pg:9104"]
+        labels:
+          db: pg
+      - targets: ["mysqld-exporter-card:9104"]
+        labels:
+          db: card
