@@ -14,6 +14,334 @@
   ],
   "panels": [
     {
+      "type": "row",
+      "title": "비즈니스",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": [],
+      "id": 32
+    },
+    {
+      "type": "timeseries",
+      "title": "승인 결과별 처리량",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (result) (rate(payment_approve_total{application=\"PG-Server\"}[1m]))",
+          "legendFormat": "{{result}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "id": 33
+    },
+    {
+      "type": "timeseries",
+      "title": "승인 성공률",
+      "description": "응답 코드는 정상(200)이어도 카드 거절·카드사 장애로 떨어질 수 있음",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(payment_approve_total{application=\"PG-Server\", result=\"approved\"}[1m])) / sum(rate(payment_approve_total{application=\"PG-Server\"}[1m]))",
+          "legendFormat": "approved / 전체",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "id": 34
+    },
+    {
+      "type": "timeseries",
+      "title": "결과 불명(REQUESTED) 거래 수",
+      "description": "카드사 응답을 못 받아 결과를 모르는 거래. 0이 아니면 정합성 위험 → 대사 필요",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "payment_transactions_requested{application=\"PG-Server\"}",
+          "legendFormat": "REQUESTED",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "id": 35
+    },
+    {
+      "type": "timeseries",
+      "title": "취소 결과별 처리량",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (result) (rate(payment_cancel_total{application=\"PG-Server\"}[1m]))",
+          "legendFormat": "{{result}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "id": 36
+    },
+    {
+      "type": "timeseries",
+      "title": "만료된 결제 (분당)",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(payment_expired_total{application=\"PG-Server\"}[1m]))",
+          "legendFormat": "expired",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "id": 37
+    },
+    {
+      "type": "timeseries",
+      "title": "정산 배치 소요 시간 / 처리 가맹점",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "settlement_duration_seconds_max{application=\"PG-Server\"}",
+          "legendFormat": "소요 시간(최근 max) {{result}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum(increase(settlement_merchants_total{application=\"PG-Server\"}[1d]))",
+          "legendFormat": "하루 처리 가맹점",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "id": 38
+    },
+    {
       "id": 1,
       "type": "row",
       "title": "PG API",
@@ -22,7 +350,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 25
       },
       "panels": []
     },
@@ -39,7 +367,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 1
+        "y": 26
       },
       "fieldConfig": {
         "defaults": {
@@ -90,7 +418,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 1
+        "y": 26
       },
       "fieldConfig": {
         "defaults": {
@@ -141,7 +469,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 9
+        "y": 34
       },
       "fieldConfig": {
         "defaults": {
@@ -192,7 +520,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 9
+        "y": 34
       },
       "fieldConfig": {
         "defaults": {
@@ -243,7 +571,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 17
+        "y": 42
       },
       "fieldConfig": {
         "defaults": {
@@ -294,7 +622,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 17
+        "y": 42
       },
       "fieldConfig": {
         "defaults": {
@@ -350,7 +678,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 50
       },
       "panels": []
     },
@@ -367,7 +695,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 26
+        "y": 51
       },
       "fieldConfig": {
         "defaults": {
@@ -436,7 +764,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 26
+        "y": 51
       },
       "fieldConfig": {
         "defaults": {
@@ -487,7 +815,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 34
+        "y": 59
       },
       "fieldConfig": {
         "defaults": {
@@ -538,7 +866,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 34
+        "y": 59
       },
       "fieldConfig": {
         "defaults": {
@@ -585,7 +913,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 42
+        "y": 67
       },
       "panels": []
     },
@@ -602,7 +930,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 43
+        "y": 68
       },
       "fieldConfig": {
         "defaults": {
@@ -653,7 +981,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 43
+        "y": 68
       },
       "fieldConfig": {
         "defaults": {
@@ -704,7 +1032,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 51
+        "y": 76
       },
       "fieldConfig": {
         "defaults": {
@@ -755,7 +1083,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 51
+        "y": 76
       },
       "fieldConfig": {
         "defaults": {
@@ -802,7 +1130,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 59
+        "y": 84
       },
       "panels": []
     },
@@ -819,7 +1147,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 60
+        "y": 85
       },
       "fieldConfig": {
         "defaults": {
@@ -879,7 +1207,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 60
+        "y": 85
       },
       "fieldConfig": {
         "defaults": {
@@ -930,7 +1258,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 68
+        "y": 93
       },
       "fieldConfig": {
         "defaults": {
@@ -981,7 +1309,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 68
+        "y": 93
       },
       "fieldConfig": {
         "defaults": {
@@ -1027,7 +1355,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 76
+        "y": 101
       },
       "panels": [],
       "id": 23
@@ -1044,7 +1372,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 77
+        "y": 102
       },
       "fieldConfig": {
         "defaults": {
@@ -1095,7 +1423,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 77
+        "y": 102
       },
       "fieldConfig": {
         "defaults": {
@@ -1146,7 +1474,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 85
+        "y": 110
       },
       "fieldConfig": {
         "defaults": {
@@ -1215,7 +1543,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 85
+        "y": 110
       },
       "fieldConfig": {
         "defaults": {
@@ -1266,7 +1594,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 93
+        "y": 118
       },
       "fieldConfig": {
         "defaults": {
@@ -1317,7 +1645,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 93
+        "y": 118
       },
       "fieldConfig": {
         "defaults": {
@@ -1368,7 +1696,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 101
+        "y": 126
       },
       "fieldConfig": {
         "defaults": {
@@ -1419,7 +1747,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 101
+        "y": 126
       },
       "fieldConfig": {
         "defaults": {
