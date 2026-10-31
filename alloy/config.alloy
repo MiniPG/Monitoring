@@ -1,0 +1,45 @@
+// 앱이 남긴 JSON 로그 파일을 읽어서 Loki로 보낸다.
+// 로컬: Monitoring docker-compose가 ../PG-Server/logs, ../Card-Server/logs를 마운트
+// AWS: 각 앱 서버에서 Alloy를 띄우고 같은 경로로 로그 디렉터리를 마운트, loki.write 주소만 모니터링 서버로 변경
+
+local.file_match "app_logs" {
+  path_targets = [
+    {"__path__" = "/logs/pg/*.log",   "app" = "PG-Server"},
+    {"__path__" = "/logs/card/*.log", "app" = "Card-Server"},
+  ]
+  sync_period = "5s"
+}
+
+loki.source.file "app_logs" {
+  targets    = local.file_match.app_logs.targets
+  forward_to = [loki.process.app_logs.receiver]
+}
+
+loki.process "app_logs" {
+  stage.json {
+    expressions = {
+      level     = "level",
+      timestamp = "\"@timestamp\"",
+    }
+  }
+
+  stage.timestamp {
+    source = "timestamp"
+    format = "RFC3339Nano"
+  }
+
+  // 라벨은 값의 종류가 적은 것만 (app, level). requestId·paymentKey는 라벨이 아니라 본문에서 검색한다.
+  stage.labels {
+    values = {
+      level = "",
+    }
+  }
+
+  forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
