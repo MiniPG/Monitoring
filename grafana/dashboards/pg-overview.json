@@ -2866,14 +2866,16 @@
               "level": "레벨",
               "logger_name": "위치(로거)",
               "msg": "메시지",
-              "Value": "건수"
+              "Value": "건수",
+              "Value #A": "건수"
             },
             "indexByName": {
               "level": 0,
               "app": 1,
               "Value": 2,
               "msg": 3,
-              "logger_name": 4
+              "logger_name": 4,
+              "Value #A": 2
             }
           }
         }
