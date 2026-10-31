@@ -1,0 +1,31 @@
+# AWS 앱·DB 서버마다 실행하는 관측 에이전트 (Infra env의 EC2가 부팅 시 실행)
+#   - 로그: /var/log/minipg/*.log (앱 JSON 로그) → Loki
+#   - 호스트 지표: CPU·메모리·디스크·네트워크 → Prometheus (remote write)
+#   필요한 환경 변수: LOKI_URL, PROMETHEUS_URL, HOST_NAME
+services:
+  alloy:
+    image: grafana/alloy:v1.5.1
+    container_name: alloy
+    command:
+      - run
+      - --server.http.listen-addr=127.0.0.1:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    # 호스트의 네트워크·프로세스 지표를 그대로 보기 위해 호스트 네임스페이스 사용
+    network_mode: host
+    pid: host
+    environment:
+      LOKI_URL: ${LOKI_URL:?LOKI_URL is required}
+      PROMETHEUS_URL: ${PROMETHEUS_URL:?PROMETHEUS_URL is required}
+      HOST_NAME: ${HOST_NAME:?HOST_NAME is required}
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - /var/log/minipg:/logs:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host/root:ro,rslave
+      - alloy-data:/var/lib/alloy/data
+    restart: unless-stopped
+
+volumes:
+  alloy-data:

@@ -1,0 +1,58 @@
+# AWS용 수집 설정: EC2 서비스 디스커버리
+#   IP를 적지 않고, 태그(Project=minipg, Role=..., Db=...)가 붙은 실행 중인 EC2를 AWS API로 찾아 수집한다.
+#   인스턴스가 교체·추가돼도 설정을 고칠 필요가 없다. (모니터링 EC2 역할에 ec2:Describe* 권한 필요)
+#   호스트 지표(CPU·메모리 등)는 각 서버의 Alloy가 remote write로 보낸다 (수집 job 없음).
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: pg-server
+    metrics_path: /actuator/prometheus
+    ec2_sd_configs:
+      - region: ap-northeast-2
+        port: 8080
+        filters:
+          - name: tag:Project
+            values: [minipg]
+          - name: tag:Role
+            values: [pg]
+          - name: instance-state-name
+            values: [running]
+    relabel_configs:
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: instance
+
+  - job_name: card-server
+    metrics_path: /actuator/prometheus
+    ec2_sd_configs:
+      - region: ap-northeast-2
+        port: 8081
+        filters:
+          - name: tag:Project
+            values: [minipg]
+          - name: tag:Role
+            values: [card]
+          - name: instance-state-name
+            values: [running]
+    relabel_configs:
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: instance
+
+  # MySQL이 있는 서버(Db 태그가 있는 EC2)의 mysqld_exporter. db 라벨은 Db 태그 값(pg, card)
+  - job_name: mysql
+    ec2_sd_configs:
+      - region: ap-northeast-2
+        port: 9104
+        filters:
+          - name: tag:Project
+            values: [minipg]
+          - name: tag-key
+            values: [Db]
+          - name: instance-state-name
+            values: [running]
+    relabel_configs:
+      - source_labels: [__meta_ec2_tag_Db]
+        target_label: db
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: instance

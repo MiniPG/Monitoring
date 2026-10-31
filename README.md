@@ -21,8 +21,21 @@ MiniPG(PG-Server, Card-Server)의 지표를 수집하고 보여주는 모니터�
 4. Prometheus 수집 상태: http://localhost:9090/targets (pg-server, card-server, mysql 2개 모두 UP)
 5. Grafana: http://localhost:3000 (admin / admin) → MiniPG 폴더 → MiniPG Overview
 
-## 수집 대상 변경 (AWS 등)
-`prometheus/prometheus.yml`의 `targets`를 서버 주소로 바꾸고 다시 읽는다.
+## AWS
+Infra 레포(env)가 EC2를 만들 때 각 서버가 부팅하면서 이 레포를 받아 실행한다. 직접 실행할 일은 없다.
+
+| 폴더 | 실행 위치 | 내용 |
+|---|---|---|
+| `aws/` | 모니터링 EC2 | Prometheus·Grafana·Loki. Grafana 비밀번호는 SSM 값을 환경 변수로 받음 |
+| `agent/` | pg, pg-db, card EC2 | Alloy: 앱 로그 → Loki, 호스트 지표(CPU·메모리·디스크·네트워크) → Prometheus remote write |
+
+- 수집 대상은 IP 대신 **EC2 태그로 자동 탐색**(`aws/prometheus.yml`, ec2_sd_configs)
+  - `Role=pg` → pg-server(8080), `Role=card` → card-server(8081), `Db` 태그가 있는 서버 → mysqld_exporter(9104), `db` 라벨 = 태그 값
+- 로그·호스트 지표에는 `host` 라벨(pg, pg-db, card)이 붙는다
+- 이 레포는 public이므로 비밀번호·키·실제 IP를 커밋하지 않는다 (docker-compose.yml의 admin/exporter는 로컬 전용 값)
+
+## 수집 대상 변경 (로컬)
+`prometheus/prometheus.yml`의 `targets`를 바꾸고 다시 읽는다.
 ```
 curl -X POST http://localhost:9090/-/reload
 ```
@@ -38,6 +51,7 @@ curl -X POST http://localhost:9090/-/reload
 | MySQL | QPS, 명령별 처리량, 연결 수(connected/running), 느린 쿼리, 행 락 대기 횟수·시간, 행 처리량, 버퍼 풀 적중률 |
 | 애플리케이션 상세 | 커넥션 획득 실패, 상태별 스레드, GC 후 live data, 할당 속도, 에러/경고 로그, 커밋/롤백 |
 | MySQL 상세 | history list length, 데드락, 쿼리별 평균 실행 시간·횟수(상위 10), 테이블별 I/O 대기 |
+| 호스트 (AWS) | 서버별 CPU 사용률·steal, 메모리, 디스크 사용률·I/O, 네트워크 |
 
 ## mysqld_exporter 추가 수집 항목
 - `--collect.info_schema.innodb_metrics`: history list length, 데드락 등 InnoDB 내부 카운터
