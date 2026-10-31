@@ -2470,10 +2470,11 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{app=~\"PG-Server|Card-Server\", level=~\"WARN|ERROR\"}"
+          "expr": "{app=~\"PG-Server|Card-Server\", level=~\"WARN|ERROR\"} | json | line_format \"[{{.app}}] {{.level}} {{.message}}{{ if .requestId }}  requestId={{.requestId}}{{ end }}{{ if .paymentKey }}  paymentKey={{.paymentKey}}{{ end }}{{ if .transactionKey }}  transactionKey={{.transactionKey}}{{ end }}\""
         }
       ],
-      "id": 54
+      "id": 54,
+      "description": "핵심 필드만 한 줄로 표시. 원문 JSON은 줄을 펼치면 볼 수 있음"
     }
   ]
 }
