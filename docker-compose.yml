@@ -36,6 +36,9 @@ services:
     command:
       - --mysqld.address=host.docker.internal:3306
       - --mysqld.username=exporter
+      - --collect.info_schema.innodb_metrics
+      - --collect.perf_schema.eventsstatements
+      - --collect.perf_schema.tableiowaits
     environment:
       MYSQLD_EXPORTER_PASSWORD: exporter
     ports:
@@ -49,6 +52,9 @@ services:
     command:
       - --mysqld.address=host.docker.internal:3307
       - --mysqld.username=exporter
+      - --collect.info_schema.innodb_metrics
+      - --collect.perf_schema.eventsstatements
+      - --collect.perf_schema.tableiowaits
     environment:
       MYSQLD_EXPORTER_PASSWORD: exporter
     ports:

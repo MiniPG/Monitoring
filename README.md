@@ -34,3 +34,16 @@ curl -X POST http://localhost:9090/-/reload
 | 카드사 | PG 기준 호출 p99, 카드사 기준 응답 p99, 호출 결과, 카드사 처리량 |
 | JVM | 힙, GC 정지 시간, CPU, 스레드 수 |
 | MySQL | QPS, 명령별 처리량, 연결 수(connected/running), 느린 쿼리, 행 락 대기 횟수·시간, 행 처리량, 버퍼 풀 적중률 |
+| 애플리케이션 상세 | 커넥션 획득 실패, 상태별 스레드, GC 후 live data, 할당 속도, 에러/경고 로그, 커밋/롤백 |
+| MySQL 상세 | history list length, 데드락, 쿼리별 평균 실행 시간·횟수(상위 10), 테이블별 I/O 대기 |
+
+## mysqld_exporter 추가 수집 항목
+- `--collect.info_schema.innodb_metrics`: history list length, 데드락 등 InnoDB 내부 카운터
+- `--collect.perf_schema.eventsstatements`: 쿼리 유형(digest)별 실행 횟수·시간
+- `--collect.perf_schema.tableiowaits`: 테이블별 I/O 대기
+
+데드락 그래프가 비어 있으면 해당 카운터가 꺼져 있는 것이므로 MySQL에서 켠다.
+```
+SET GLOBAL innodb_monitor_enable = 'lock_deadlocks';
+```
+
