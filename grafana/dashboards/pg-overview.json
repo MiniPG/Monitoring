@@ -672,7 +672,7 @@
     {
       "id": 8,
       "type": "row",
-      "title": "DB 커넥션 (HikariCP)",
+      "title": "DB 커넥션 (HikariCP, PG·카드사)",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -724,8 +724,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "hikaricp_connections_active{application=\"PG-Server\"}",
-          "legendFormat": "active",
+          "expr": "hikaricp_connections_active{application=~\"PG-Server|Card-Server\"}",
+          "legendFormat": "{{application}} active",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
@@ -733,8 +733,8 @@
         },
         {
           "refId": "B",
-          "expr": "hikaricp_connections_idle{application=\"PG-Server\"}",
-          "legendFormat": "idle",
+          "expr": "hikaricp_connections_idle{application=~\"PG-Server|Card-Server\"}",
+          "legendFormat": "{{application}} idle",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
@@ -742,8 +742,8 @@
         },
         {
           "refId": "C",
-          "expr": "hikaricp_connections_max{application=\"PG-Server\"}",
-          "legendFormat": "max",
+          "expr": "hikaricp_connections_max{application=~\"PG-Server|Card-Server\"}",
+          "legendFormat": "{{application}} max",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
@@ -793,8 +793,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "hikaricp_connections_pending{application=\"PG-Server\"}",
-          "legendFormat": "pending",
+          "expr": "hikaricp_connections_pending{application=~\"PG-Server|Card-Server\"}",
+          "legendFormat": "{{application}} pending",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
@@ -844,8 +844,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "rate(hikaricp_connections_acquire_seconds_sum{application=\"PG-Server\"}[1m]) / rate(hikaricp_connections_acquire_seconds_count{application=\"PG-Server\"}[1m])",
-          "legendFormat": "acquire",
+          "expr": "rate(hikaricp_connections_acquire_seconds_sum{application=~\"PG-Server|Card-Server\"}[1m]) / rate(hikaricp_connections_acquire_seconds_count{application=~\"PG-Server|Card-Server\"}[1m])",
+          "legendFormat": "{{application}} acquire",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
@@ -895,8 +895,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "rate(hikaricp_connections_usage_seconds_sum{application=\"PG-Server\"}[1m]) / rate(hikaricp_connections_usage_seconds_count{application=\"PG-Server\"}[1m])",
-          "legendFormat": "usage",
+          "expr": "rate(hikaricp_connections_usage_seconds_sum{application=~\"PG-Server|Card-Server\"}[1m]) / rate(hikaricp_connections_usage_seconds_count{application=~\"PG-Server|Card-Server\"}[1m])",
+          "legendFormat": "{{application}} usage",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
