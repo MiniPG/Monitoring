@@ -2454,14 +2454,15 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 201
+        "y": 211
       },
       "options": {
         "showTime": true,
-        "wrapLogMessage": true,
+        "wrapLogMessage": false,
         "sortOrder": "Descending",
         "enableLogDetails": true,
-        "prettifyLogMessage": false
+        "prettifyLogMessage": false,
+        "dedupStrategy": "signature"
       },
       "targets": [
         {
@@ -2470,11 +2471,11 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{app=~\"PG-Server|Card-Server\", level=~\"WARN|ERROR\"} | json | line_format \"[{{.app}}] {{.level}} {{.message}}{{ if .requestId }}  requestId={{.requestId}}{{ end }}{{ if .paymentKey }}  paymentKey={{.paymentKey}}{{ end }}{{ if .transactionKey }}  transactionKey={{.transactionKey}}{{ end }}\""
+          "expr": "{app=~\"PG-Server|Card-Server\", level=~\"WARN|ERROR\"} |~ \"(?i)$log_search\" | json | line_format \"[{{.app}}] {{.level}} {{ regexReplaceAll \\\"(?s)\\\\n.*\\\" .message \\\"\\\" | trunc 150 }}{{ if .requestId }}  requestId={{.requestId}}{{ end }}{{ if .paymentKey }}  paymentKey={{.paymentKey}}{{ end }}{{ if .transactionKey }}  transactionKey={{.transactionKey}}{{ end }}\""
         }
       ],
       "id": 54,
-      "description": "핵심 필드만 한 줄로 표시. 원문 JSON은 줄을 펼치면 볼 수 있음"
+      "description": "한 줄에 하나씩(메시지 첫 줄, 150자). 같은 형태의 반복 로그는 묶어서 표시. 줄을 클릭하면 스택 트레이스·원문 JSON 확인"
     },
     {
       "type": "row",
@@ -2484,7 +2485,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 213
+        "y": 223
       },
       "panels": [],
       "id": 55
@@ -2501,7 +2502,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 214
+        "y": 224
       },
       "fieldConfig": {
         "defaults": {
@@ -2554,7 +2555,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 214
+        "y": 224
       },
       "fieldConfig": {
         "defaults": {
@@ -2605,7 +2606,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 222
+        "y": 232
       },
       "fieldConfig": {
         "defaults": {
@@ -2658,7 +2659,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 222
+        "y": 232
       },
       "fieldConfig": {
         "defaults": {
@@ -2711,7 +2712,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 230
+        "y": 240
       },
       "fieldConfig": {
         "defaults": {
@@ -2771,7 +2772,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 230
+        "y": 240
       },
       "fieldConfig": {
         "defaults": {
@@ -2818,6 +2819,163 @@
         }
       ],
       "id": 61
+    },
+    {
+      "type": "table",
+      "title": "WARN / ERROR 종류별 집계 (선택한 기간)",
+      "description": "같은 메시지(첫 줄 기준)를 묶어 건수로 보여준다. 어떤 문제가 몇 번 났는지 먼저 보고, 아래 로그 패널에서 상세를 확인한다",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 201
+      },
+      "id": 62,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "queryType": "instant",
+          "instant": true,
+          "legendFormat": "",
+          "expr": "sum by (app, level, logger_name, msg) (count_over_time({app=~\"PG-Server|Card-Server\", level=~\"WARN|ERROR\"} |~ \"(?i)$log_search\" | json | label_format msg=\"{{ regexReplaceAll \\\"(?s)\\\\n.*\\\" .message \\\"\\\" | trunc 150 }}\" [$__range]))"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "app": "앱",
+              "level": "레벨",
+              "logger_name": "위치(로거)",
+              "msg": "메시지",
+              "Value": "건수"
+            },
+            "indexByName": {
+              "level": 0,
+              "app": 1,
+              "Value": 2,
+              "msg": 3,
+              "logger_name": 4
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "레벨"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 80
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "ERROR": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "WARN": {
+                        "color": "orange",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "앱"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "건수"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 80
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "sortBy": [
+          {
+            "displayName": "건수",
+            "desc": true
+          }
+        ]
+      }
     }
-  ]
+  ],
+  "templating": {
+    "list": [
+      {
+        "type": "textbox",
+        "name": "log_search",
+        "label": "로그 검색",
+        "description": "WARN/ERROR 로그에서 찾을 단어(정규식, 대소문자 무시). 비우면 전체",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 0
+      }
+    ]
+  }
 }
