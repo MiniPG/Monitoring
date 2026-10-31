@@ -2381,6 +2381,99 @@
         }
       ],
       "id": 51
+    },
+    {
+      "type": "row",
+      "title": "로그",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 192
+      },
+      "panels": [],
+      "id": 52
+    },
+    {
+      "type": "timeseries",
+      "title": "레벨별 로그 수 (분당)",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 193
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 60,
+            "stacking": {
+              "mode": "normal"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "sum by (app, level) (count_over_time({app=~\"PG-Server|Card-Server\"}[1m]))",
+          "legendFormat": "{{app}} {{level}}"
+        }
+      ],
+      "id": 53
+    },
+    {
+      "type": "logs",
+      "title": "WARN / ERROR 로그",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 201
+      },
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{app=~\"PG-Server|Card-Server\", level=~\"WARN|ERROR\"}"
+        }
+      ],
+      "id": 54
     }
   ]
 }

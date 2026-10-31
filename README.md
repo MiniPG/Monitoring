@@ -7,6 +7,8 @@ MiniPG(PG-Server, Card-Server)의 지표를 수집하고 보여주는 모니터�
 - Prometheus (9090): 5초마다 각 서버의 `/actuator/prometheus` 수집, 15일 보관
 - Grafana (3000): Prometheus 데이터 소스와 `MiniPG Overview` 대시보드 자동 등록
 - mysqld_exporter (9104: PG DB, 9105: 카드사 DB): MySQL 상태 지표를 Prometheus 형식으로 변환
+- Loki (3100): 로그 저장소
+- Alloy (12345): 앱의 JSON 로그 파일(`../PG-Server/logs`, `../Card-Server/logs`)을 읽어 Loki로 전송
 
 ## 로컬 실행
 1. PG-Server(8080), Card-Server(8081)를 실행한다.
@@ -46,4 +48,14 @@ curl -X POST http://localhost:9090/-/reload
 ```
 SET GLOBAL innodb_monitor_enable = 'lock_deadlocks';
 ```
+
+## 로그
+- 앱은 `logs/*.log`에 JSON(logstash 형식)으로 기록하고, Alloy가 읽어 Loki로 보낸다. 콘솔 출력은 사람이 읽는 형식 그대로.
+- 라벨은 `app`, `level`만 사용 (값 종류가 적은 것만 라벨로). requestId·paymentKey는 본문에서 검색.
+- Grafana → Explore → Loki 예시
+  - 요청 하나의 전체 흐름 (PG → 카드사까지 같은 requestId):
+    `{app=~".+"} | json | requestId="응답 헤더 X-Request-Id 값"`
+  - 결제 하나의 이력: `{app="PG-Server"} | json | paymentKey="pk_..."`
+  - 카드사 응답 없음: `{app="PG-Server", level="WARN"} |= "결과 모름"`
+- 앱을 먼저 한 번 실행해 `logs` 디렉터리가 생긴 뒤 `docker compose up -d`를 하는 것을 권장
 
