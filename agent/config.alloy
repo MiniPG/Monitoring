@@ -58,6 +58,7 @@ prometheus.exporter.unix "host" {
 prometheus.scrape "host" {
   targets         = prometheus.exporter.unix.host.targets
   scrape_interval = "5s"
+  scrape_timeout  = "4s" // 기본값 10s는 수집 주기(5s)보다 길어서 Alloy가 설정을 거부한다
   forward_to      = [prometheus.remote_write.default.receiver]
 }
 
