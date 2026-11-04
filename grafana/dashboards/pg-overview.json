@@ -14,6 +14,235 @@
   ],
   "panels": [
     {
+      "id": 63,
+      "type": "row",
+      "title": "SLO",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "id": 64,
+      "type": "timeseries",
+      "title": "응답 시간 SLO 달성률 (기준 이하로 끝난 비율, 5분)",
+      "description": "SLO 경계(le)로 센 정확한 비율. 목표 99%. 5xx는 가용성에서 따로 센다.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0.95,
+          "max": 1,
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.99
+              }
+            ]
+          },
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "min",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "생성 (100ms 이하)",
+          "expr": "sum(rate(http_server_requests_seconds_bucket{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments\", status!~\"5..\", le=\"0.1\"}[5m])) / sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments\", status!~\"5..\"}[5m]))"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "조회 (100ms 이하)",
+          "expr": "sum(rate(http_server_requests_seconds_bucket{application=\"PG-Server\", method=\"GET\", uri=\"/v1/payments/{paymentKey}\", status!~\"5..\", le=\"0.1\"}[5m])) / sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"GET\", uri=\"/v1/payments/{paymentKey}\", status!~\"5..\"}[5m]))"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "거래 목록 (200ms 이하)",
+          "expr": "sum(rate(http_server_requests_seconds_bucket{application=\"PG-Server\", method=\"GET\", uri=\"/v1/transactions\", status!~\"5..\", le=\"0.2\"}[5m])) / sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"GET\", uri=\"/v1/transactions\", status!~\"5..\"}[5m]))"
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "승인 (800ms 이하)",
+          "expr": "sum(rate(http_server_requests_seconds_bucket{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments/confirm\", status!~\"5..\", le=\"0.8\"}[5m])) / sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments/confirm\", status!~\"5..\"}[5m]))"
+        },
+        {
+          "refId": "E",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "취소 (800ms 이하)",
+          "expr": "sum(rate(http_server_requests_seconds_bucket{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments/{paymentKey}/cancel\", status!~\"5..\", le=\"0.8\"}[5m])) / sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments/{paymentKey}/cancel\", status!~\"5..\"}[5m]))"
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "type": "timeseries",
+      "title": "가용성 SLO (5xx가 아닌 비율, 5분)",
+      "description": "목표: 생성·조회·거래 목록 99.9%, 승인·취소 99.5% (카드사 의존). 4xx는 실패로 보지 않는다.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0.98,
+          "max": 1,
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.995
+              },
+              {
+                "color": "red",
+                "value": 0.999
+              }
+            ]
+          },
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "min",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "생성",
+          "expr": "1 - (sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments\", status=~\"5..\"}[5m])) or vector(0)) / sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments\"}[5m]))"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "조회",
+          "expr": "1 - (sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"GET\", uri=\"/v1/payments/{paymentKey}\", status=~\"5..\"}[5m])) or vector(0)) / sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"GET\", uri=\"/v1/payments/{paymentKey}\"}[5m]))"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "거래 목록",
+          "expr": "1 - (sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"GET\", uri=\"/v1/transactions\", status=~\"5..\"}[5m])) or vector(0)) / sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"GET\", uri=\"/v1/transactions\"}[5m]))"
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "승인",
+          "expr": "1 - (sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments/confirm\", status=~\"5..\"}[5m])) or vector(0)) / sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments/confirm\"}[5m]))"
+        },
+        {
+          "refId": "E",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "취소",
+          "expr": "1 - (sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments/{paymentKey}/cancel\", status=~\"5..\"}[5m])) or vector(0)) / sum(rate(http_server_requests_seconds_count{application=\"PG-Server\", method=\"POST\", uri=\"/v1/payments/{paymentKey}/cancel\"}[5m]))"
+        }
+      ]
+    },
+    {
       "type": "row",
       "title": "비즈니스",
       "collapsed": false,
@@ -21,7 +250,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 11
       },
       "panels": [],
       "id": 32
@@ -38,7 +267,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 1
+        "y": 12
       },
       "fieldConfig": {
         "defaults": {
@@ -89,7 +318,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 1
+        "y": 12
       },
       "fieldConfig": {
         "defaults": {
@@ -140,7 +369,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 9
+        "y": 20
       },
       "fieldConfig": {
         "defaults": {
@@ -191,7 +420,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 9
+        "y": 20
       },
       "fieldConfig": {
         "defaults": {
@@ -242,7 +471,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 17
+        "y": 28
       },
       "fieldConfig": {
         "defaults": {
@@ -293,7 +522,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 17
+        "y": 28
       },
       "fieldConfig": {
         "defaults": {
@@ -350,7 +579,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 36
       },
       "panels": []
     },
@@ -367,7 +596,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 26
+        "y": 37
       },
       "fieldConfig": {
         "defaults": {
@@ -409,7 +638,7 @@
       "id": 3,
       "type": "timeseries",
       "title": "응답 시간 p99",
-      "description": "",
+      "description": "자동 bucket 안을 직선 보간한 추정값. 요청이 한 bucket에 몰리면 bucket 끝 값으로 붙는다. SLO 판정은 위 SLO 달성률 패널로 본다.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -418,14 +647,34 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 26
+        "y": 37
       },
       "fieldConfig": {
         "defaults": {
           "unit": "s",
           "custom": {
             "lineWidth": 1,
-            "fillOpacity": 10
+            "fillOpacity": 10,
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.1
+              },
+              {
+                "color": "red",
+                "value": 0.8
+              }
+            ]
           }
         },
         "overrides": []
@@ -469,7 +718,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 34
+        "y": 45
       },
       "fieldConfig": {
         "defaults": {
@@ -520,7 +769,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 34
+        "y": 45
       },
       "fieldConfig": {
         "defaults": {
@@ -571,7 +820,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 53
       },
       "fieldConfig": {
         "defaults": {
@@ -622,7 +871,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 42
+        "y": 53
       },
       "fieldConfig": {
         "defaults": {
@@ -678,7 +927,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 50
+        "y": 61
       },
       "panels": []
     },
@@ -695,7 +944,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 51
+        "y": 62
       },
       "fieldConfig": {
         "defaults": {
@@ -764,7 +1013,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 51
+        "y": 62
       },
       "fieldConfig": {
         "defaults": {
@@ -815,7 +1064,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 59
+        "y": 70
       },
       "fieldConfig": {
         "defaults": {
@@ -866,7 +1115,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 59
+        "y": 70
       },
       "fieldConfig": {
         "defaults": {
@@ -913,7 +1162,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 67
+        "y": 78
       },
       "panels": []
     },
@@ -930,7 +1179,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 68
+        "y": 79
       },
       "fieldConfig": {
         "defaults": {
@@ -981,7 +1230,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 68
+        "y": 79
       },
       "fieldConfig": {
         "defaults": {
@@ -1032,7 +1281,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 76
+        "y": 87
       },
       "fieldConfig": {
         "defaults": {
@@ -1083,7 +1332,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 76
+        "y": 87
       },
       "fieldConfig": {
         "defaults": {
@@ -1130,7 +1379,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 84
+        "y": 95
       },
       "panels": []
     },
@@ -1147,7 +1396,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 85
+        "y": 96
       },
       "fieldConfig": {
         "defaults": {
@@ -1207,7 +1456,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 85
+        "y": 96
       },
       "fieldConfig": {
         "defaults": {
@@ -1258,7 +1507,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 93
+        "y": 104
       },
       "fieldConfig": {
         "defaults": {
@@ -1309,7 +1558,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 93
+        "y": 104
       },
       "fieldConfig": {
         "defaults": {
@@ -1355,7 +1604,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 101
+        "y": 112
       },
       "panels": [],
       "id": 23
@@ -1372,7 +1621,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 102
+        "y": 113
       },
       "fieldConfig": {
         "defaults": {
@@ -1423,7 +1672,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 102
+        "y": 113
       },
       "fieldConfig": {
         "defaults": {
@@ -1474,7 +1723,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 110
+        "y": 121
       },
       "fieldConfig": {
         "defaults": {
@@ -1543,7 +1792,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 110
+        "y": 121
       },
       "fieldConfig": {
         "defaults": {
@@ -1594,7 +1843,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 118
+        "y": 129
       },
       "fieldConfig": {
         "defaults": {
@@ -1645,7 +1894,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 118
+        "y": 129
       },
       "fieldConfig": {
         "defaults": {
@@ -1696,7 +1945,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 126
+        "y": 137
       },
       "fieldConfig": {
         "defaults": {
@@ -1747,7 +1996,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 126
+        "y": 137
       },
       "fieldConfig": {
         "defaults": {
@@ -1794,7 +2043,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 134
+        "y": 145
       },
       "panels": [],
       "id": 39
@@ -1811,7 +2060,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 135
+        "y": 146
       },
       "fieldConfig": {
         "defaults": {
@@ -1862,7 +2111,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 135
+        "y": 146
       },
       "fieldConfig": {
         "defaults": {
@@ -1913,7 +2162,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 143
+        "y": 154
       },
       "fieldConfig": {
         "defaults": {
@@ -1973,7 +2222,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 143
+        "y": 154
       },
       "fieldConfig": {
         "defaults": {
@@ -2024,7 +2273,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 151
+        "y": 162
       },
       "fieldConfig": {
         "defaults": {
@@ -2075,7 +2324,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 151
+        "y": 162
       },
       "fieldConfig": {
         "defaults": {
@@ -2122,7 +2371,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 159
+        "y": 170
       },
       "panels": [],
       "id": 46
@@ -2139,7 +2388,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 160
+        "y": 171
       },
       "fieldConfig": {
         "defaults": {
@@ -2190,7 +2439,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 160
+        "y": 171
       },
       "fieldConfig": {
         "defaults": {
@@ -2241,7 +2490,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 168
+        "y": 179
       },
       "fieldConfig": {
         "defaults": {
@@ -2292,7 +2541,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 176
+        "y": 187
       },
       "fieldConfig": {
         "defaults": {
@@ -2343,7 +2592,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 184
+        "y": 195
       },
       "fieldConfig": {
         "defaults": {
@@ -2390,7 +2639,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 192
+        "y": 203
       },
       "panels": [],
       "id": 52
@@ -2406,7 +2655,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 193
+        "y": 204
       },
       "fieldConfig": {
         "defaults": {
@@ -2454,7 +2703,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 211
+        "y": 222
       },
       "options": {
         "showTime": true,
@@ -2485,7 +2734,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 223
+        "y": 234
       },
       "panels": [],
       "id": 55
@@ -2502,7 +2751,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 224
+        "y": 235
       },
       "fieldConfig": {
         "defaults": {
@@ -2555,7 +2804,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 224
+        "y": 235
       },
       "fieldConfig": {
         "defaults": {
@@ -2606,7 +2855,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 232
+        "y": 243
       },
       "fieldConfig": {
         "defaults": {
@@ -2659,7 +2908,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 232
+        "y": 243
       },
       "fieldConfig": {
         "defaults": {
@@ -2712,7 +2961,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 240
+        "y": 251
       },
       "fieldConfig": {
         "defaults": {
@@ -2772,7 +3021,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 240
+        "y": 251
       },
       "fieldConfig": {
         "defaults": {
@@ -2832,7 +3081,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 201
+        "y": 212
       },
       "id": 62,
       "targets": [
