@@ -1504,6 +1504,108 @@
       ]
     },
     {
+      "id": 66,
+      "type": "timeseries",
+      "title": "GC 횟수 (초당)",
+      "description": "GC가 1초에 몇 번 일어나는지. 객체 할당이 줄면 같이 줄어야 함",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 112
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (application) (rate(jvm_gc_pause_seconds_count[1m]))",
+          "legendFormat": "{{application}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "type": "timeseries",
+      "title": "GC 한 번당 평균 정지 시간",
+      "description": "정지 시간 합 ÷ 횟수. 횟수가 줄었는데 이 값이 커지면 한 번에 더 많이 치우는 것",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 112
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (application) (rate(jvm_gc_pause_seconds_sum[1m])) / sum by (application) (rate(jvm_gc_pause_seconds_count[1m]))",
+          "legendFormat": "{{application}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
       "id": 21,
       "type": "timeseries",
       "title": "CPU 사용률",
@@ -1613,7 +1715,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 112
+        "y": 120
       },
       "panels": [],
       "id": 23
@@ -1630,7 +1732,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 113
+        "y": 121
       },
       "fieldConfig": {
         "defaults": {
@@ -1681,7 +1783,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 113
+        "y": 121
       },
       "fieldConfig": {
         "defaults": {
@@ -1732,7 +1834,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 121
+        "y": 129
       },
       "fieldConfig": {
         "defaults": {
@@ -1801,7 +1903,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 121
+        "y": 129
       },
       "fieldConfig": {
         "defaults": {
@@ -1852,7 +1954,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 129
+        "y": 137
       },
       "fieldConfig": {
         "defaults": {
@@ -1903,7 +2005,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 129
+        "y": 137
       },
       "fieldConfig": {
         "defaults": {
@@ -1954,7 +2056,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 137
+        "y": 145
       },
       "fieldConfig": {
         "defaults": {
@@ -2005,7 +2107,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 137
+        "y": 145
       },
       "fieldConfig": {
         "defaults": {
@@ -2052,7 +2154,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 145
+        "y": 153
       },
       "panels": [],
       "id": 39
@@ -2069,7 +2171,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 146
+        "y": 154
       },
       "fieldConfig": {
         "defaults": {
@@ -2120,7 +2222,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 146
+        "y": 154
       },
       "fieldConfig": {
         "defaults": {
@@ -2171,7 +2273,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 154
+        "y": 162
       },
       "fieldConfig": {
         "defaults": {
@@ -2231,7 +2333,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 154
+        "y": 162
       },
       "fieldConfig": {
         "defaults": {
@@ -2282,7 +2384,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 162
+        "y": 170
       },
       "fieldConfig": {
         "defaults": {
@@ -2333,7 +2435,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 162
+        "y": 170
       },
       "fieldConfig": {
         "defaults": {
@@ -2380,7 +2482,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 170
+        "y": 178
       },
       "panels": [],
       "id": 46
@@ -2397,7 +2499,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 171
+        "y": 179
       },
       "fieldConfig": {
         "defaults": {
@@ -2448,7 +2550,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 171
+        "y": 179
       },
       "fieldConfig": {
         "defaults": {
@@ -2499,7 +2601,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 179
+        "y": 187
       },
       "fieldConfig": {
         "defaults": {
@@ -2550,7 +2652,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 187
+        "y": 195
       },
       "fieldConfig": {
         "defaults": {
@@ -2601,7 +2703,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 195
+        "y": 203
       },
       "fieldConfig": {
         "defaults": {
@@ -2648,7 +2750,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 203
+        "y": 211
       },
       "panels": [],
       "id": 52
@@ -2664,7 +2766,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 204
+        "y": 212
       },
       "fieldConfig": {
         "defaults": {
@@ -2712,7 +2814,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 222
+        "y": 230
       },
       "options": {
         "showTime": true,
@@ -2743,7 +2845,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 234
+        "y": 242
       },
       "panels": [],
       "id": 55
@@ -2760,7 +2862,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 235
+        "y": 243
       },
       "fieldConfig": {
         "defaults": {
@@ -2813,7 +2915,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 235
+        "y": 243
       },
       "fieldConfig": {
         "defaults": {
@@ -2864,7 +2966,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 243
+        "y": 251
       },
       "fieldConfig": {
         "defaults": {
@@ -2917,7 +3019,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 243
+        "y": 251
       },
       "fieldConfig": {
         "defaults": {
@@ -2970,7 +3072,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 251
+        "y": 259
       },
       "fieldConfig": {
         "defaults": {
@@ -3030,7 +3132,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 251
+        "y": 259
       },
       "fieldConfig": {
         "defaults": {
@@ -3090,7 +3192,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 212
+        "y": 220
       },
       "id": 62,
       "targets": [
